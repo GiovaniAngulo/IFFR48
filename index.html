@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IFFR-48 | Aplicación Clínica</title>
+    <!-- Tailwind para Diseño -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para la Gráfica -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- HTML2Canvas para tomar foto de los resultados -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { background-color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
         .radio-btn:checked + div { background-color: #3b82f6; color: white; border-color: #3b82f6; }
@@ -65,11 +70,17 @@
             </button>
         </form>
 
-        <!-- Resultados (Siempre Visibles tras procesar, sin bloqueo) -->
-        <div id="resultados" class="hidden mt-8 bg-white p-6 rounded-xl shadow-md border border-slate-200">
-            <h2 class="text-xl font-bold mb-4 border-b pb-2">Reporte Clínico</h2>
-            
-            <div id="perfil-valido">
+        <!-- Resultados -->
+        <div id="resultados" class="hidden mt-8">
+            <!-- Zona de captura para la imagen (Todo lo que está aquí saldrá en la foto) -->
+            <div id="zona-captura" class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <h2 class="text-xl font-bold mb-4 border-b pb-2">Reporte Clínico IFFR-48</h2>
+                
+                <!-- Alerta visual de validez (Solo se muestra si la prueba es inválida) -->
+                <div id="alerta-ui" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 font-semibold text-sm">
+                    <!-- El texto de alerta se inyecta por JS -->
+                </div>
+
                 <div class="flex justify-between items-center mb-6 bg-slate-50 p-4 rounded-lg">
                     <span class="font-bold text-lg">Índice Total (ITFR):</span>
                     <span id="score-total" class="text-3xl font-black text-blue-600">0</span>
@@ -78,6 +89,12 @@
                 <div class="mb-6">
                     <h3 class="font-bold text-slate-700 mb-2">Estado Clínico Estimado:</h3>
                     <p id="rango-texto" class="text-lg bg-blue-50 text-blue-800 p-3 rounded border border-blue-200"></p>
+                </div>
+
+                <!-- CONTENEDOR DE LA GRÁFICA -->
+                <div class="mb-6 bg-white p-4 rounded-lg border border-slate-200">
+                    <h3 class="font-bold text-slate-700 mb-4 text-center">Perfil Dimensional</h3>
+                    <canvas id="graficaResultados" width="400" height="200"></canvas>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -98,15 +115,15 @@
                         <span id="score-d" class="text-xl font-bold">0</span> / 30
                     </div>
                 </div>
+            </div> <!-- Fin zona captura -->
 
-                <!-- Botón para enviar por WhatsApp -->
-                <button type="button" id="btn-whatsapp" class="mt-8 w-full bg-green-500 hover:bg-green-600 text-white font-bold text-lg py-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.12.553 4.14 1.604 5.946L.22 24l6.196-1.624A11.97 11.97 0 0012.031 24c6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm3.882 17.262c-.179.502-.999.965-1.46.994-.424.027-1.02-.08-2.457-.677-1.748-.727-2.883-2.525-2.97-2.642-.086-.117-1.127-1.503-1.127-2.866 0-1.363.708-2.032.96-2.296.252-.264.555-.331.737-.331.183 0 .366.002.527.01.171.008.399-.065.606.435.215.518.7 1.714.764 1.84.064.126.108.273.022.443-.086.17-.13.275-.259.427-.129.152-.27.323-.385.452-.129.143-.267.3-.11.571.155.27 .693 1.15 1.488 1.862.916.822 1.782 1.082 2.052 1.208.27.126.43.104.593-.084.163-.188.705-.823.896-1.106.192-.283.385-.236.634-.143.249.093 1.579.746 1.848.88.27.135.45.2.516.311.066.111.066.644-.113 1.146z"/></svg>
-                    Enviar Resultados a mi Terapeuta
-                </button>
+            <!-- Botón para enviar imagen por WhatsApp -->
+            <button type="button" id="btn-whatsapp" class="mt-8 w-full bg-green-500 hover:bg-green-600 text-white font-bold text-lg py-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.12.553 4.14 1.604 5.946L.22 24l6.196-1.624A11.97 11.97 0 0012.031 24c6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm3.882 17.262c-.179.502-.999.965-1.46.994-.424.027-1.02-.08-2.457-.677-1.748-.727-2.883-2.525-2.97-2.642-.086-.117-1.127-1.503-1.127-2.866 0-1.363.708-2.032.96-2.296.252-.264.555-.331.737-.331.183 0 .366.002.527.01.171.008.399-.065.606.435.215.518.7 1.714.764 1.84.064.126.108.273.022.443-.086.17-.13.275-.259.427-.129.152-.27.323-.385.452-.129.143-.267.3-.11.571.155.27 .693 1.15 1.488 1.862.916.822 1.782 1.082 2.052 1.208.27.126.43.104.593-.084.163-.188.705-.823.896-1.106.192-.283.385-.236.634-.143.249.093 1.579.746 1.848.88.27.135.45.2.516.311.066.111.066.644-.113 1.146z"/></svg>
+                <span id="btn-text">Enviar Gráfica y Resultados al Terapeuta</span>
+            </button>
 
-                <button type="button" onclick="window.location.reload()" class="mt-4 text-sm text-slate-500 underline text-center w-full">Nueva Evaluación</button>
-            </div>
+            <button type="button" id="btn-reload" onclick="window.location.reload()" class="mt-4 text-sm text-slate-500 underline text-center w-full">Nueva Evaluación</button>
         </div>
     </div>
 
@@ -185,9 +202,10 @@
         });
 
         let mensajeWhatsApp = "";
+        let miGrafica = null; 
 
         // AQUÍ DEBES PONER TU NÚMERO REAL DE WHATSAPP (CON CÓDIGO 52 PARA MÉXICO)
-        const numeroPsicologo = "526632149308";
+        const numeroPsicologo = "526641234567";
 
         document.getElementById('iffr-form').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -208,22 +226,28 @@
             let banderaAzar = trampaInfrecuencia.some(val => val > 0);
             let banderaDefensa = trampaDefensa.reduce((a, b) => a + b, 0) >= 8;
 
+            const alertaUi = document.getElementById('alerta-ui');
+            
             if (banderaAzar && banderaDefensa) {
                 alertaValidez = "⚠️ PRUEBA INVÁLIDA (MÚLTIPLES BANDERAS): El consultante marcó ítems clínicamente imposibles Y proyectó una imagen irreal de perfección. Revisar estado clínico con urgencia.";
+                alertaUi.innerText = alertaValidez;
+                alertaUi.classList.remove('hidden');
             } else if (banderaAzar) {
-                alertaValidez = "⚠️ ALERTA EXAGERACIÓN / AZAR: El consultante marcó síntomas fisiológicamente imposibles. Posible respuesta al azar, falta de lectura, o llamado de auxilio ('cry for help').";
+                alertaValidez = "⚠️ ALERTA EXAGERACIÓN / AZAR: El consultante marcó síntomas fisiológicamente imposibles. Posible respuesta al azar, o llamado de auxilio ('cry for help').";
+                alertaUi.innerText = alertaValidez;
+                alertaUi.classList.remove('hidden');
             } else if (banderaDefensa) {
-                alertaValidez = "⚠️ ALERTA ACTITUD DEFENSIVA: Deseabilidad social alta. El consultante ocultó vulnerabilidades intentando proyectar una imagen de perfección psicológica irreal.";
+                alertaValidez = "⚠️ ALERTA ACTITUD DEFENSIVA: Deseabilidad social alta. El consultante ocultó vulnerabilidades intentando proyectar una imagen de perfección irreal.";
+                alertaUi.innerText = alertaValidez;
+                alertaUi.classList.remove('hidden');
             } else {
                 alertaValidez = "✅ Prueba Válida y Confiable.";
+                alertaUi.classList.add('hidden');
             }
 
-            // Mostrar resultados en UI sin bloquear
+            // Mostrar resultados (El DIV contenedor)
             const resDiv = document.getElementById('resultados');
-            const perfilDiv = document.getElementById('perfil-valido');
-            
             resDiv.classList.remove('hidden');
-            perfilDiv.classList.remove('hidden');
 
             // Calcular Dimensiones Clínicas
             const dimA = r(2)+r(5)+r(10)+r(15)+r(20)+r(25)+r(29)+r(34)+r(39)+r(44);
@@ -241,37 +265,123 @@
             document.getElementById('score-d').innerText = dimD;
             document.getElementById('score-total').innerText = total;
 
-            // Lógica de rangos ajustada por edad numérica exacta
+            // RENDERIZAR LA GRÁFICA
+            const ctx = document.getElementById('graficaResultados').getContext('2d');
+            if (miGrafica) { miGrafica.destroy(); }
+
+            miGrafica = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['A. Hipermentalización', 'B. Equiv. Psíquica', 'C. Pens. Teleológico', 'D. Falla Resiliencia'],
+                    datasets: [{
+                        label: 'Puntos',
+                        data: [dimA, dimB, dimC, dimD],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.7)',
+                            'rgba(249, 115, 22, 0.7)',
+                            'rgba(234, 179, 8, 0.7)',
+                            'rgba(59, 130, 246, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(220, 38, 38)',
+                            'rgb(234, 88, 12)',
+                            'rgb(202, 138, 4)',
+                            'rgb(37, 99, 235)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, max: 30, ticks: { stepSize: 5 } },
+                        x: { ticks: { font: { size: 10 } } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Lógica de rangos
             let diagnostico = "";
             if (edadNum >= 16 && edadNum <= 22) {
                 if(total <= 45) diagnostico = "Rango Normativo"; else if(total <= 85) diagnostico = "Colapso Moderado"; else diagnostico = "Colapso Severo";
             } else if (edadNum >= 23 && edadNum <= 59) {
                 if(total <= 35) diagnostico = "Rango Normativo"; else if(total <= 75) diagnostico = "Colapso Moderado"; else diagnostico = "Colapso Severo";
-            } else { // 60+
+            } else { 
                 if(total <= 40) diagnostico = "Rango Normativo"; else if(total <= 80) diagnostico = "Colapso Moderado"; else diagnostico = "Colapso Severo";
             }
 
             document.getElementById('rango-texto').innerText = diagnostico;
 
-            // Recopilar respuestas del 1 al 48 para el reporte clínico
+            // Recopilar respuestas
             let listaRespuestas = "";
             for(let i = 1; i <= 48; i++) {
                 listaRespuestas += `${i}:[${r(i)}] `;
                 if(i % 12 === 0) listaRespuestas += "\n"; 
             }
 
-            // Construir el mensaje estructurado para el Profesional
-            mensajeWhatsApp = `Hola, soy ${nombre}.\nAcabo de completar mi inventario IFFR-48.\n\n*DATOS DEMOGRÁFICOS:*\nSexo: ${sexo}\nEdad: ${edadNum} años\nEducación: ${educacion}\n\n*RESULTADOS GLOBALES:*\nÍndice Total (ITFR): *${total} puntos*\nEstado: *${diagnostico}*\n\n*ANÁLISIS DE VALIDEZ OCULTO:*\n${alertaValidez}\n\n*PERFIL DIMENSIONAL:*\nA. Hipermentalización: ${dimA}/30\nB. Equivalencia Psíquica: ${dimB}/30\nC. Pensamiento Teleológico: ${dimC}/30\nD. Falla en Resiliencia: ${dimD}/30\n\n*DESGLOSE DE RESPUESTAS (1-48):*\n${listaRespuestas}`;
+            // Construir el mensaje de WhatsApp texto
+            mensajeWhatsApp = `Hola, soy ${nombre}.\nAcabo de completar mi inventario IFFR-48.\n\n*DATOS DEMOGRÁFICOS:*\nSexo: ${sexo}\nEdad: ${edadNum} años\nEducación: ${educacion}\n\n*RESULTADOS GLOBALES:*\nÍndice Total (ITFR): *${total} puntos*\nEstado: *${diagnostico}*\n\n*ANÁLISIS DE VALIDEZ:*\n${alertaValidez}\n\n*DESGLOSE DE RESPUESTAS (1-48):*\n${listaRespuestas}`;
 
             resDiv.scrollIntoView({ behavior: 'smooth' });
         });
 
-        // Evento para el botón de WhatsApp
-        document.getElementById('btn-whatsapp').addEventListener('click', function() {
-            if(mensajeWhatsApp !== "") {
-                const url = `https://wa.me/${numeroPsicologo}?text=${encodeURIComponent(mensajeWhatsApp)}`;
-                window.open(url, '_blank');
-            }
+        // EVENTO PARA TOMAR FOTO Y ENVIAR
+        document.getElementById('btn-whatsapp').addEventListener('click', async function() {
+            const btn = this;
+            const originalText = document.getElementById('btn-text').innerText;
+            document.getElementById('btn-text').innerText = "Generando imagen...";
+            
+            // 1. Ocultar botones para que no salgan en la foto
+            btn.style.display = 'none';
+            document.getElementById('btn-reload').style.display = 'none';
+
+            // 2. Tomar captura de pantalla del div "zona-captura"
+            const capturaDiv = document.getElementById('zona-captura');
+            const canvas = await html2canvas(capturaDiv, { scale: 2 }); // Scale 2 para alta calidad
+
+            // 3. Restaurar botones
+            btn.style.display = 'flex';
+            document.getElementById('btn-reload').style.display = 'block';
+            document.getElementById('btn-text').innerText = originalText;
+
+            // 4. Convertir y compartir
+            canvas.toBlob(async function(blob) {
+                const file = new File([blob], "Resultados_IFFR48.png", { type: "image/png" });
+                
+                // Intento 1: Si es celular, usar Web Share API (Comparte archivo y texto directo a WhatsApp)
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            title: 'Resultados IFFR-48',
+                            text: mensajeWhatsApp,
+                            files: [file]
+                        });
+                        return; // Éxito
+                    } catch (error) {
+                        console.log("El usuario canceló o falló el Share API", error);
+                    }
+                }
+                
+                // Intento 2: Si está en computadora (Fallback)
+                alert("Tu dispositivo descargará la imagen con la gráfica automáticamente. A continuación se abrirá WhatsApp Web; por favor adjunta la imagen descargada en el chat.");
+                
+                // Descargar imagen
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "Grafica_IFFR48.png";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Abrir texto en WA Web
+                const waUrl = `https://wa.me/${numeroPsicologo}?text=${encodeURIComponent(mensajeWhatsApp)}`;
+                setTimeout(() => window.open(waUrl, '_blank'), 1500);
+
+            }, 'image/png');
         });
     </script>
 </body>
