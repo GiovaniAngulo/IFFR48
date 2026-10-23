@@ -65,12 +65,9 @@
             </button>
         </form>
 
-        <!-- Resultados (Ocultos inicialmente) -->
+        <!-- Resultados (Siempre Visibles tras procesar, sin bloqueo) -->
         <div id="resultados" class="hidden mt-8 bg-white p-6 rounded-xl shadow-md border border-slate-200">
             <h2 class="text-xl font-bold mb-4 border-b pb-2">Reporte Clínico</h2>
-            <div id="alerta-validez" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 font-semibold">
-                PRUEBA INVÁLIDA: Se detectaron respuestas al azar o alta actitud defensiva/deseabilidad social. No se recomienda interpretar el perfil.
-            </div>
             
             <div id="perfil-valido">
                 <div class="flex justify-between items-center mb-6 bg-slate-50 p-4 rounded-lg">
@@ -79,7 +76,7 @@
                 </div>
                 
                 <div class="mb-6">
-                    <h3 class="font-bold text-slate-700 mb-2">Estado Clínico (Ajustado por Edad):</h3>
+                    <h3 class="font-bold text-slate-700 mb-2">Estado Clínico Estimado:</h3>
                     <p id="rango-texto" class="text-lg bg-blue-50 text-blue-800 p-3 rounded border border-blue-200"></p>
                 </div>
 
@@ -120,49 +117,49 @@
             "Fui capaz de dar un paso atrás y dudar de mis propias conclusiones iniciales.",
             "Sentí que las palabras no valían; necesitaba que me demostraran afecto con acciones inmediatas.",
             "Estuve seguro(a) de que alguien estaba molesto conmigo, aunque no me lo dijo directamente.",
-            "Esta semana logré dormir más de 30 horas seguidas en un solo día sin despertar.",
+            "Debido al estrés, olvidé por completo mi propio nombre o dónde vivo durante varias horas en la semana.",
             "Sentí que si me sentía culpable o avergonzado(a), era porque algo andaba mal en mí.",
             "Pensé que, si alguien realmente se preocupaba por mí, habría dejado todo para atenderme.",
             "Pude aceptar que, en el fondo, tal vez no entendía completamente las intenciones de la otra persona.",
             "Sentí que los demás me juzgaban negativamente, incluso cuando no había pruebas claras.",
             "Me costó mucho trabajo identificar qué emoción sentía exactamente.",
-            "Durante esta semana, nunca tuve ni un solo pensamiento negativo sobre nada ni nadie.",
+            "Fui capaz de entender perfectamente las intenciones de todos, sin equivocarme ni una sola vez en la semana.",
             "Creí que la única forma de resolver un conflicto era que el otro hiciera un sacrificio visible por mí.",
             "Logré hacer una pausa y calmarme antes de reaccionar impulsivamente.",
             "Asumí que sabía exactamente lo que otra persona estaba pensando o planeando en mi contra.",
             "Sentí que mis emociones me dominaban tanto que me fue imposible pensar con lógica.",
             "Ante un problema, sentí la urgencia incontrolable de actuar físicamente para aliviarme.",
-            "Para confirmar que está leyendo las preguntas con atención, por favor marque la opción '2'.",
+            "Mis emociones me abrumaron tanto que pasé más de tres días seguidos sin comer ni beber absolutamente nada.",
             "Me di cuenta de que mi forma de ver un problema estaba influenciada por mi estado de ánimo.",
             "Creí que los comentarios de otras personas tenían un doble sentido dirigido a lastimarme.",
             "Creí que mi forma de ver una situación era la única verdad posible y los demás estaban equivocados.",
             "Sentí que solo podía confiar en alguien si veía pruebas físicas inmediatas de su lealtad.",
             "Fui capaz de escuchar el punto de vista de otra persona, aunque me pareciera ilógico.",
-            "En los últimos 7 días, jamás cometí un error ni me equivoqué en absolutamente nada.",
+            "Mi estado de ánimo fue completamente estable y no sentí ninguna emoción desagradable en los últimos 7 días.",
             "Pensé que las actitudes distantes de los demás eran una señal clara de que me iban a rechazar.",
             "Sentí un vacío interno o una confusión tan grande que no supe explicar qué me pasaba.",
             "Pensé que disculparse con palabras era inútil si no venía acompañado de una acción.",
             "Pude identificar y nombrar mis emociones con claridad después de que pasó la tensión.",
             "Pensé que, si alguien me hizo sentir mal, su intención deliberada era hacerme daño.",
-            "Esta semana logré pasar tres días completos sin tomar ni una sola gota de agua o líquidos.",
+            "Me sentí tan desconectado(a) que no pude dormir ni un solo minuto en los últimos 7 días.",
             "Me fue difícil separar lo que imaginaba que iba a pasar de lo que realmente estaba sucediendo.",
             "Juzgué el interés de los demás en mí exclusivamente por la rapidez con la que me respondían.",
             "Reconocí que las personas pueden tener buenas intenciones aunque sus acciones me lastimen.",
             "Estuve convencido(a) de que la gente actuaba por motivos egoístas o en mi contra.",
             "Experimenté emociones tan abrumadoras que sentí que mi mente se 'apagaba' o se bloqueaba.",
-            "Durante la última semana, me llevé perfectamente bien con todos sin sentir molestia.",
+            "Nunca, en toda la semana, sentí la más mínima impaciencia o frustración hacia otra persona.",
             "Sentí que la única forma de demostrar mi malestar era a través de una acción drástica.",
             "Logré aceptar que está bien no tener todas las respuestas sobre el futuro de mis relaciones.",
             "Anticipé los pensamientos de los demás y actué en consecuencia antes de que dijeran algo.",
             "Sentí que mi visión de los problemas era la realidad objetiva y quien pensara distinto estaba ciego.",
             "Creí que el amor o la amistad solo son reales cuando implican estar físicamente presentes.",
-            "Esta semana logré estar despierto(a) por 72 horas seguidas sin sentir nada de sueño.",
+            "Sentí una confusión tan profunda que perdí totalmente la capacidad de leer o entender palabras durante días.",
             "Pude comunicar cómo me sentía usando palabras, en lugar de recurrir a acciones impulsivas.",
             "Sentí la seguridad absoluta de que las personas hablaban mal a mis espaldas.",
             "Cuando me sentí rechazado(a), lo viví como un hecho real e incuestionable.",
             "Creí que los sentimientos no sirven de nada si no se traducen en favores concretos o regalos.",
             "Fui capaz de cambiar de opinión sobre una persona al recibir nueva información objetiva.",
-            "Durante estos 7 días, mi mente estuvo 100% en paz y jamás sentí ni un segundo de preocupación."
+            "Logré comunicarme con tanta claridad que nadie tuvo el menor malentendido conmigo esta semana."
         ];
 
         const container = document.getElementById('preguntas-container');
@@ -203,30 +200,32 @@
             const formData = new FormData(this);
             const r = (num) => parseInt(formData.get(`q${num}`));
 
-            const trampaAtencion = [r(6), r(18), r(30), r(42)];
+            // Análisis de Validez Oculto
+            const trampaInfrecuencia = [r(6), r(18), r(30), r(42)];
             const trampaDefensa = [r(12), r(24), r(36), r(48)];
             
-            let invalida = false;
-            if (trampaAtencion[1] !== 2 || trampaAtencion[0] !== 0 || trampaAtencion[2] !== 0 || trampaAtencion[3] !== 0) invalida = true;
-            if (trampaDefensa.reduce((a, b) => a + b, 0) >= 8) invalida = true;
+            let alertaValidez = "";
+            let banderaAzar = trampaInfrecuencia.some(val => val > 0);
+            let banderaDefensa = trampaDefensa.reduce((a, b) => a + b, 0) >= 8;
 
+            if (banderaAzar && banderaDefensa) {
+                alertaValidez = "⚠️ PRUEBA INVÁLIDA (MÚLTIPLES BANDERAS): El consultante marcó ítems clínicamente imposibles Y proyectó una imagen irreal de perfección. Revisar estado clínico con urgencia.";
+            } else if (banderaAzar) {
+                alertaValidez = "⚠️ ALERTA EXAGERACIÓN / AZAR: El consultante marcó síntomas fisiológicamente imposibles. Posible respuesta al azar, falta de lectura, o llamado de auxilio ('cry for help').";
+            } else if (banderaDefensa) {
+                alertaValidez = "⚠️ ALERTA ACTITUD DEFENSIVA: Deseabilidad social alta. El consultante ocultó vulnerabilidades intentando proyectar una imagen de perfección psicológica irreal.";
+            } else {
+                alertaValidez = "✅ Prueba Válida y Confiable.";
+            }
+
+            // Mostrar resultados en UI sin bloquear
             const resDiv = document.getElementById('resultados');
-            const alertDiv = document.getElementById('alerta-validez');
             const perfilDiv = document.getElementById('perfil-valido');
             
             resDiv.classList.remove('hidden');
-
-            if (invalida) {
-                alertDiv.classList.remove('hidden');
-                perfilDiv.classList.add('hidden');
-                resDiv.scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            alertDiv.classList.add('hidden');
             perfilDiv.classList.remove('hidden');
 
-            // Calcular Dimensiones
+            // Calcular Dimensiones Clínicas
             const dimA = r(2)+r(5)+r(10)+r(15)+r(20)+r(25)+r(29)+r(34)+r(39)+r(44);
             const dimB = r(1)+r(7)+r(11)+r(16)+r(21)+r(26)+r(31)+r(35)+r(40)+r(45);
             const dimC = r(4)+r(8)+r(13)+r(17)+r(22)+r(27)+r(32)+r(37)+r(41)+r(46);
@@ -254,15 +253,15 @@
 
             document.getElementById('rango-texto').innerText = diagnostico;
 
-            // Recopilar respuestas del 1 al 48 para el reporte
+            // Recopilar respuestas del 1 al 48 para el reporte clínico
             let listaRespuestas = "";
             for(let i = 1; i <= 48; i++) {
                 listaRespuestas += `${i}:[${r(i)}] `;
-                if(i % 12 === 0) listaRespuestas += "\n"; // Salto de línea cada 12 respuestas para que se vea ordenado
+                if(i % 12 === 0) listaRespuestas += "\n"; 
             }
 
-            // Construir el mensaje estructurado de WhatsApp
-            mensajeWhatsApp = `Hola, soy ${nombre}.\nAcabo de completar mi inventario IFFR-48.\n\n*DATOS DEMOGRÁFICOS:*\nSexo: ${sexo}\nEdad: ${edadNum} años\nEducación: ${educacion}\n\n*RESULTADOS:*\nÍndice Total (ITFR): *${total} puntos*\nEstado: *${diagnostico}*\n\n*PERFIL DIMENSIONAL:*\nA. Hipermentalización: ${dimA}/30\nB. Equivalencia Psíquica: ${dimB}/30\nC. Pensamiento Teleológico: ${dimC}/30\nD. Falla en Resiliencia: ${dimD}/30\n\n*DESGLOSE DE RESPUESTAS (1-48):*\n${listaRespuestas}\nPrueba Válida: Sí.`;
+            // Construir el mensaje estructurado para el Profesional
+            mensajeWhatsApp = `Hola, soy ${nombre}.\nAcabo de completar mi inventario IFFR-48.\n\n*DATOS DEMOGRÁFICOS:*\nSexo: ${sexo}\nEdad: ${edadNum} años\nEducación: ${educacion}\n\n*RESULTADOS GLOBALES:*\nÍndice Total (ITFR): *${total} puntos*\nEstado: *${diagnostico}*\n\n*ANÁLISIS DE VALIDEZ OCULTO:*\n${alertaValidez}\n\n*PERFIL DIMENSIONAL:*\nA. Hipermentalización: ${dimA}/30\nB. Equivalencia Psíquica: ${dimB}/30\nC. Pensamiento Teleológico: ${dimC}/30\nD. Falla en Resiliencia: ${dimD}/30\n\n*DESGLOSE DE RESPUESTAS (1-48):*\n${listaRespuestas}`;
 
             resDiv.scrollIntoView({ behavior: 'smooth' });
         });
