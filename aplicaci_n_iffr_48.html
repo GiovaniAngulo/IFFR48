@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación IFFR-48</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .radio-btn-group input[type="radio"] { display: none; }
+        .radio-btn-group label {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .radio-btn-group input[type="radio"]:checked + label {
+            background-color: #2563eb; /* blue-600 */
+            color: white;
+            border-color: #2563eb;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen pb-12">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-slate-800 tracking-tight">IFFR-48</h1>
+            <span class="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">Uso Clínico</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 mt-8">
+        
+        <!-- Instructions -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Inventario de Fluctuación de la Función Reflexiva</h2>
+            <p class="text-slate-600 mb-4 leading-relaxed">
+                A continuación, se presentan una serie de afirmaciones sobre cómo las personas piensan y sienten en su vida diaria. Por favor, lea cada una cuidadosamente y evalúe con qué frecuencia o intensidad experimentó esto <strong>exclusivamente durante los últimos 7 días</strong>.
+            </p>
+            <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
+                <h3 class="font-semibold text-blue-900 mb-2">Escala de respuesta:</h3>
+                <ul class="text-sm text-blue-800 space-y-1">
+                    <li><strong>0 = Nunca / En absoluto</strong> (No me ocurrió esta semana).</li>
+                    <li><strong>1 = Rara vez / Levemente</strong> (Me ocurrió, pero pude manejarlo rápido).</li>
+                    <li><strong>2 = Frecuentemente / Moderadamente</strong> (Afectó mi humor o mis relaciones).</li>
+                    <li><strong>3 = Casi siempre / Severamente</strong> (Dominó mi semana, no pude pensar de otra forma).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Form container -->
+        <form id="iffr-form" class="space-y-6">
+            <div id="questions-container" class="space-y-6">
+                <!-- Questions will be dynamically injected here by JS -->
+            </div>
+
+            <!-- Error Message Box (Hidden by default) -->
+            <div id="error-message" class="hidden bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-6">
+                <p class="text-red-700 font-medium">Por favor, responda todas las preguntas antes de calcular los resultados.</p>
+                <p id="missing-questions" class="text-sm text-red-600 mt-1"></p>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="sticky bottom-6 z-40 bg-white/90 backdrop-blur p-4 rounded-2xl shadow-lg border border-slate-200 text-center">
+                <button type="button" onclick="calcularResultados()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl transition duration-200 shadow-md hover:shadow-lg focus:ring-4 focus:ring-blue-200">
+                    Calcular Resultados
+                </button>
+            </div>
+        </form>
+
+        <!-- Results Section (Hidden by default) -->
+        <div id="results-section" class="hidden mt-12 bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+            <div class="bg-slate-800 p-6 text-white text-center">
+                <h2 class="text-2xl font-bold">Resultados Clínicos (ITFR)</h2>
+                <p class="text-slate-300 mt-2 text-sm">Perfil dimensional del consultante</p>
+            </div>
+            
+            <div class="p-6 md:p-8">
+                <!-- Invalid Alert -->
+                <div id="invalid-alert" class="hidden bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+                    <div class="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-red-800 mb-2">Prueba Inválida (Escala V)</h3>
+                    <p class="text-red-700 mb-4" id="invalid-reason">El perfil no es interpretable debido a inconsistencias en la validación.</p>
+                    <p class="text-sm text-red-600">No se mostrarán los puntajes clínicos para evitar falsas interpretaciones. Considere el estado de atención del consultante o un patrón de deseabilidad social severa.</p>
+                </div>
+
+                <!-- Valid Results -->
+                <div id="valid-results" class="hidden">
+                    <div class="text-center mb-8">
+                        <h3 class="text-lg text-slate-500 font-semibold uppercase tracking-wider mb-2">Índice Total de Fluctuación Reflexiva</h3>
+                        <div class="text-5xl font-black text-slate-800" id="total-score">0</div>
+                        <p class="text-sm text-slate-500 mt-2">Puntaje máximo posible: 120</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Dimensión A -->
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-bold text-slate-700">A. Hipermentalización</h4>
+                                <span id="score-a" class="text-lg font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-lg">0</span>
+                            </div>
+                            <p class="text-xs text-slate-500">Certeza y proyección. Paranoia interpersonal.</p>
+                        </div>
+                        
+                        <!-- Dimensión B -->
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-bold text-slate-700">B. Equivalencia Psíquica</h4>
+                                <span id="score-b" class="text-lg font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-lg">0</span>
+                            </div>
+                            <p class="text-xs text-slate-500">Confusión y rigidez. Fusión emoción/realidad.</p>
+                        </div>
+
+                        <!-- Dimensión C -->
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-bold text-slate-700">C. Pensamiento Teleológico</h4>
+                                <span id="score-c" class="text-lg font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-lg">0</span>
+                            </div>
+                            <p class="text-xs text-slate-500">Concreción conductual y urgencia física.</p>
+                        </div>
+
+                        <!-- Dimensión D -->
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-bold text-slate-700">D. Falla de Resiliencia</h4>
+                                <span id="score-d" class="text-lg font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-lg">0</span>
+                            </div>
+                            <p class="text-xs text-slate-500">Incapacidad para recuperar la perspectiva. (Puntaje invertido).</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <button onclick="window.print()" class="text-slate-500 hover:text-blue-600 font-medium underline transition">
+                            Imprimir Reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Array of 48 items
+        const items = [
+            "Mis miedos o preocupaciones se sintieron como realidades absolutas que iban a pasar sí o sí.",
+            "Le di muchas vueltas a pequeños detalles (miradas, mensajes, tonos) para descubrir intenciones ocultas en los demás.",
+            "Fui capaz de dar un paso atrás y dudar de mis propias conclusiones iniciales durante un conflicto.",
+            "Sentí que las palabras no valían; necesitaba que me demostraran afecto con acciones inmediatas o cosas materiales.",
+            "Estuve seguro(a) de que alguien estaba molesto conmigo, aunque no me lo dijo directamente.",
+            "Esta semana logré dormir más de 30 horas seguidas en un solo día sin despertar.",
+            "Sentí que si me sentía culpable o avergonzado(a), era porque definitivamente algo andaba mal en mí.",
+            "Pensé que, si alguien realmente se preocupaba por mí, habría dejado todo para atenderme.",
+            "Pude aceptar que, en el fondo, tal vez no entendía completamente las intenciones de la otra persona.",
+            "Sentí que los demás me juzgaban negativamente, incluso cuando no había pruebas claras de ello.",
+            "Me costó mucho trabajo identificar qué emoción sentía exactamente (por ejemplo, confundir enojo con tristeza).",
+            "Durante esta semana, nunca tuve ni un solo pensamiento negativo sobre nada ni nadie.",
+            "Creí que la única forma de resolver un conflicto era que la otra persona hiciera un sacrificio visible por mí.",
+            "Logré hacer una pausa y calmarme antes de reaccionar impulsivamente ante una situación estresante.",
+            "Asumí que sabía exactamente lo que otra persona estaba pensando o planeando en mi contra.",
+            "Sentí que mis emociones me dominaban tanto que me fue imposible pensar con lógica.",
+            "Ante un problema emocional, sentí la urgencia incontrolable de actuar físicamente (huir, romper algo) para aliviarme.",
+            "Para confirmar que está leyendo las preguntas con atención, por favor marque la opción \"2\".",
+            "Me di cuenta de que mi forma de ver un problema estaba fuertemente influenciada por mi estado de ánimo.",
+            "Creí que los comentarios de otras personas tenían un doble sentido dirigido a lastimarme.",
+            "Creí que mi forma de ver una situación era la única verdad posible y que los demás estaban equivocados.",
+            "Sentí que solo podía confiar en alguien si veía pruebas físicas inmediatas de su lealtad.",
+            "Fui capaz de escuchar el punto de vista de otra persona, aunque al principio me pareciera ilógico.",
+            "En los últimos 7 días, jamás cometí un error ni me equivoqué en absolutamente nada.",
+            "Pensé que las actitudes distantes de los demás eran una señal clara de que me iban a rechazar.",
+            "Sentí un vacío interno o una confusión tan grande que no supe explicar qué me pasaba.",
+            "Pensé que disculparse con palabras era inútil si no venía acompañado de una acción que compensara el daño.",
+            "Pude identificar y nombrar mis emociones con claridad después de que pasó el momento de tensión.",
+            "Pensé que, si alguien me hizo sentir mal, su intención deliberada era hacerme daño.",
+            "Esta semana logré pasar tres días completos sin tomar ni una sola gota de agua o líquidos.",
+            "Me fue difícil separar lo que imaginaba que iba a pasar de lo que realmente estaba sucediendo.",
+            "Juzgué el interés de los demás en mí exclusivamente por la rapidez con la que me respondían o actuaban.",
+            "Reconocí que las personas pueden tener buenas intenciones aunque sus acciones terminen lastimándome.",
+            "Estuve convencido(a) de que la gente actuaba por motivos egoístas o en mi contra.",
+            "Experimenté emociones tan abrumadoras que sentí que mi mente se \"apagaba\" o se bloqueaba.",
+            "Durante la última semana, me llevé perfectamente bien con todos sin sentir ni un segundo de molestia.",
+            "Sentí que la única forma de demostrar mi malestar era a través de una acción drástica o visible, no solo hablando.",
+            "Logré aceptar que está bien no tener todas las respuestas sobre lo que depara el futuro en mis relaciones.",
+            "Anticipé los pensamientos de los demás y actué en consecuencia antes de que ellos dijeran algo.",
+            "Sentí que mi visión de los problemas era la realidad objetiva y cualquiera que pensara distinto estaba ciego.",
+            "Creí que el amor o la amistad solo son reales cuando implican estar físicamente presentes en todo momento.",
+            "Esta semana logré estar despierto(a) por 72 horas seguidas sin sentir nada de sueño.",
+            "Pude comunicar cómo me sentía usando palabras, en lugar de recurrir a acciones impulsivas o distanciamiento.",
+            "Sentí la seguridad absoluta de que las personas hablaban mal a mis espaldas cuando yo no estaba.",
+            "Cuando me sentí rechazado(a), lo viví como un hecho real e incuestionable, sin buscar otras explicaciones.",
+            "Creí que los sentimientos no sirven de nada si no se traducen en favores concretos o regalos.",
+            "Fui capaz de cambiar de opinión sobre una persona o situación al recibir nueva información objetiva.",
+            "Durante estos 7 días, mi mente estuvo 100% en paz y jamás sentí ni un segundo de preocupación."
+        ];
+
+        // Generate form dynamically
+        const container = document.getElementById('questions-container');
+        
+        items.forEach((itemText, index) => {
+            const qNum = index + 1;
+            const itemHTML = `
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm transition hover:shadow-md" id="card-${qNum}">
+                    <p class="font-medium text-slate-800 mb-4 text-lg"><span class="text-blue-600 font-bold mr-2">${qNum}.</span> ${itemText}</p>
+                    <div class="grid grid-cols-4 gap-2 radio-btn-group">
+                        <div>
+                            <input type="radio" id="q${qNum}_0" name="q${qNum}" value="0">
+                            <label for="q${qNum}_0" class="block text-center p-3 border border-slate-200 rounded-lg text-slate-600 font-semibold bg-slate-50 hover:bg-slate-100">0</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q${qNum}_1" name="q${qNum}" value="1">
+                            <label for="q${qNum}_1" class="block text-center p-3 border border-slate-200 rounded-lg text-slate-600 font-semibold bg-slate-50 hover:bg-slate-100">1</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q${qNum}_2" name="q${qNum}" value="2">
+                            <label for="q${qNum}_2" class="block text-center p-3 border border-slate-200 rounded-lg text-slate-600 font-semibold bg-slate-50 hover:bg-slate-100">2</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="q${qNum}_3" name="q${qNum}" value="3">
+                            <label for="q${qNum}_3" class="block text-center p-3 border border-slate-200 rounded-lg text-slate-600 font-semibold bg-slate-50 hover:bg-slate-100">3</label>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', itemHTML);
+        });
+
+        // Clear missing highlights
+        function clearErrors() {
+            for(let i=1; i<=48; i++) {
+                document.getElementById(`card-${i}`).classList.remove('border-red-400', 'ring-2', 'ring-red-100');
+            }
+            document.getElementById('error-message').classList.add('hidden');
+        }
+
+        // Logic function
+        function calcularResultados() {
+            clearErrors();
+            let answers = []; // We will use 1-based indexing so answers[1] = item 1
+            let missing = [];
+
+            // 1. Gather responses
+            for(let i=1; i<=48; i++) {
+                let selected = document.querySelector(`input[name="q${i}"]:checked`);
+                if(selected) {
+                    answers[i] = parseInt(selected.value);
+                } else {
+                    missing.push(i);
+                }
+            }
+
+            // 2. Validate completeness
+            if(missing.length > 0) {
+                missing.forEach(qNum => {
+                    let card = document.getElementById(`card-${qNum}`);
+                    card.classList.add('border-red-400', 'ring-2', 'ring-red-100');
+                });
+                document.getElementById('missing-questions').innerText = `Faltan las preguntas: ${missing.join(', ')}`;
+                document.getElementById('error-message').classList.remove('hidden');
+                
+                // Scroll to first error
+                document.getElementById(`card-${missing[0]}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            // --- Show results block ---
+            const resultsSection = document.getElementById('results-section');
+            const validResults = document.getElementById('valid-results');
+            const invalidAlert = document.getElementById('invalid-alert');
+            const invalidReason = document.getElementById('invalid-reason');
+            
+            resultsSection.classList.remove('hidden');
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+
+            // 3. Validez (Escala V)
+            let isInvalid = false;
+            let reasonText = "";
+
+            // Check item 18 (Must be 2)
+            if(answers[18] !== 2) {
+                isInvalid = true;
+                reasonText = "El reactivo de control de atención (#18) no fue respondido correctamente, lo que sugiere que las respuestas fueron al azar.";
+            }
+            
+            // Check items 6, 30, 42 (Imposibilidad biológica, must be 0)
+            if(answers[6] > 0 || answers[30] > 0 || answers[42] > 0) {
+                isInvalid = true;
+                reasonText = "Se detectaron respuestas positivas a escenarios biológicamente imposibles (dormir 30h, no beber agua 3 días, etc.), sugiriendo respuestas aleatorias o falta de comprensión lectora.";
+            }
+
+            // Check items 12, 24, 36, 48 (Deseabilidad / Defensividad)
+            let defensivenessScore = answers[12] + answers[24] + answers[36] + answers[48];
+            if(defensivenessScore > 6) {
+                isInvalid = true;
+                reasonText = "Se detectó un nivel crítico de defensividad o deseabilidad social extrema. El consultante afirma un grado de perfección emocional y conductual irreal.";
+            }
+
+            if(isInvalid) {
+                invalidAlert.classList.remove('hidden');
+                validResults.classList.add('hidden');
+                invalidReason.innerText = reasonText;
+                return; // Stop calculation
+            }
+
+            // 4. Clinical Scoring (If valid)
+            invalidAlert.classList.add('hidden');
+            validResults.classList.remove('hidden');
+
+            const arrA = [2, 5, 10, 15, 20, 25, 29, 34, 39, 44];
+            const arrB = [1, 7, 11, 16, 21, 26, 31, 35, 40, 45];
+            const arrC = [4, 8, 13, 17, 22, 27, 32, 37, 41, 46];
+            const arrD = [3, 9, 14, 19, 23, 28, 33, 38, 43, 47]; // To be reversed
+
+            let sumA = 0;
+            let sumB = 0;
+            let sumC = 0;
+            let sumDReversed = 0;
+
+            arrA.forEach(q => sumA += answers[q]);
+            arrB.forEach(q => sumB += answers[q]);
+            arrC.forEach(q => sumC += answers[q]);
+            
+            // Reverse scoring for D: 0->3, 1->2, 2->1, 3->0 => formula: 3 - value
+            arrD.forEach(q => {
+                sumDReversed += (3 - answers[q]);
+            });
+
+            let totalITFR = sumA + sumB + sumC + sumDReversed;
+
+            // 5. Update UI
+            document.getElementById('score-a').innerText = sumA;
+            document.getElementById('score-b').innerText = sumB;
+            document.getElementById('score-c').innerText = sumC;
+            document.getElementById('score-d').innerText = sumDReversed;
+            document.getElementById('total-score').innerText = totalITFR;
+
+            // Update Total color based on severity (General thresholds)
+            let totalEl = document.getElementById('total-score');
+            totalEl.classList.remove('text-green-600', 'text-yellow-600', 'text-red-600', 'text-slate-800');
+            if(totalITFR <= 35) {
+                totalEl.classList.add('text-green-600');
+            } else if(totalITFR <= 75) {
+                totalEl.classList.add('text-yellow-600');
+            } else {
+                totalEl.classList.add('text-red-600');
+            }
+        }
+    </script>
+</body>
+</html>
