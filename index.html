@@ -18,21 +18,39 @@
             <h1 class="text-2xl font-bold text-slate-900 mb-2">Inventario de Fluctuación de la Función Reflexiva (IFFR-48)</h1>
             <p class="text-slate-600 text-sm mb-4">A continuación, evalúe con qué frecuencia experimentó las siguientes situaciones <strong>exclusivamente durante los últimos 7 días</strong>.</p>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 p-4 bg-slate-50 rounded-lg border border-slate-100">
-                <div>
-                    <label class="block text-sm font-semibold mb-1 text-blue-800">Rango de Edad:</label>
-                    <select id="edad" class="w-full border border-blue-300 rounded-md p-2 bg-white font-medium" required>
-                        <option value="" disabled selected>Seleccione un rango...</option>
-                        <option value="joven">16 a 22 años (Adolescencia Tardía/Juventud)</option>
-                        <option value="adulto">23 a 59 años (Adultez Joven/Media)</option>
-                        <option value="mayor">60 años o más (Adultez Mayor)</option>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6 p-4 bg-slate-50 rounded-lg border border-slate-100">
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold mb-1 text-slate-700">Nombre Completo:</label>
+                    <input type="text" id="nombre" class="w-full border rounded-md p-2 bg-white" placeholder="Ej. Carlos Martínez" required>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold mb-1 text-slate-700">Sexo:</label>
+                    <select id="sexo" class="w-full border rounded-md p-2 bg-white" required>
+                        <option value="" disabled selected>Seleccione...</option>
+                        <option value="Femenino">Femenino</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Otro/Prefiero no decir">Otro / Prefiero no decir</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold mb-1">Nivel Educativo:</label>
-                    <select id="educacion" class="w-full border rounded-md p-2 bg-white">
-                        <option value="basica">Educación Básica / Media</option>
-                        <option value="superior">Educación Superior / Universitaria</option>
+
+                <div class="md:col-span-1">
+                    <label class="block text-sm font-semibold mb-1 text-blue-800">Edad:</label>
+                    <input type="number" id="edad" min="16" max="99" class="w-full border border-blue-300 rounded-md p-2 bg-white font-medium" placeholder="Ej. 28" required>
+                </div>
+                
+                <div class="md:col-span-3">
+                    <label class="block text-sm font-semibold mb-1 text-slate-700">Grado Educativo:</label>
+                    <select id="educacion" class="w-full border rounded-md p-2 bg-white" required>
+                        <option value="" disabled selected>Seleccione su grado de estudios...</option>
+                        <option value="Primaria">Primaria</option>
+                        <option value="Secundaria">Secundaria</option>
+                        <option value="Preparatoria">Preparatoria / Bachillerato</option>
+                        <option value="Carrera Técnica">Carrera Técnica</option>
+                        <option value="Licenciatura">Licenciatura / Ingeniería</option>
+                        <option value="Maestría">Maestría</option>
+                        <option value="Doctorado">Doctorado</option>
                     </select>
                 </div>
             </div>
@@ -83,7 +101,14 @@
                         <span id="score-d" class="text-xl font-bold">0</span> / 30
                     </div>
                 </div>
-                <button type="button" onclick="window.location.reload()" class="mt-6 text-sm text-slate-500 underline text-center w-full">Nueva Evaluación</button>
+
+                <!-- Botón para enviar por WhatsApp -->
+                <button type="button" id="btn-whatsapp" class="mt-8 w-full bg-green-500 hover:bg-green-600 text-white font-bold text-lg py-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.12.553 4.14 1.604 5.946L.22 24l6.196-1.624A11.97 11.97 0 0012.031 24c6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm3.882 17.262c-.179.502-.999.965-1.46.994-.424.027-1.02-.08-2.457-.677-1.748-.727-2.883-2.525-2.97-2.642-.086-.117-1.127-1.503-1.127-2.866 0-1.363.708-2.032.96-2.296.252-.264.555-.331.737-.331.183 0 .366.002.527.01.171.008.399-.065.606.435.215.518.7 1.714.764 1.84.064.126.108.273.022.443-.086.17-.13.275-.259.427-.129.152-.27.323-.385.452-.129.143-.267.3-.11.571.155.27 .693 1.15 1.488 1.862.916.822 1.782 1.082 2.052 1.208.27.126.43.104.593-.084.163-.188.705-.823.896-1.106.192-.283.385-.236.634-.143.249.093 1.579.746 1.848.88.27.135.45.2.516.311.066.111.066.644-.113 1.146z"/></svg>
+                    Enviar Resultados a mi Terapeuta
+                </button>
+
+                <button type="button" onclick="window.location.reload()" class="mt-4 text-sm text-slate-500 underline text-center w-full">Nueva Evaluación</button>
             </div>
         </div>
     </div>
@@ -162,30 +187,28 @@
             container.insertAdjacentHTML('beforeend', html);
         });
 
+        let mensajeWhatsApp = "";
+
+        // AQUÍ DEBES PONER TU NÚMERO REAL DE WHATSAPP (CON CÓDIGO 52 PARA MÉXICO)
+        const numeroPsicologo = "526632149308";
+
         document.getElementById('iffr-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Validar que se haya seleccionado un rango de edad
-            const rangoEdad = document.getElementById('edad').value;
-            if (!rangoEdad) {
-                alert("Por favor, seleccione el rango de edad del consultante antes de calcular.");
-                return;
-            }
+            const nombre = document.getElementById('nombre').value;
+            const sexo = document.getElementById('sexo').value;
+            const edadNum = parseInt(document.getElementById('edad').value);
+            const educacion = document.getElementById('educacion').value;
 
             const formData = new FormData(this);
             const r = (num) => parseInt(formData.get(`q${num}`));
 
-            // Escala V
             const trampaAtencion = [r(6), r(18), r(30), r(42)];
             const trampaDefensa = [r(12), r(24), r(36), r(48)];
             
-            // Validar atención (18 debe ser 2, los demás 0)
             let invalida = false;
             if (trampaAtencion[1] !== 2 || trampaAtencion[0] !== 0 || trampaAtencion[2] !== 0 || trampaAtencion[3] !== 0) invalida = true;
-            
-            // Validar defensividad (Si suma más de 8 puntos fingiendo perfección)
-            const sumaDefensa = trampaDefensa.reduce((a, b) => a + b, 0);
-            if (sumaDefensa >= 8) invalida = true;
+            if (trampaDefensa.reduce((a, b) => a + b, 0) >= 8) invalida = true;
 
             const resDiv = document.getElementById('resultados');
             const alertDiv = document.getElementById('alerta-validez');
@@ -203,12 +226,11 @@
             alertDiv.classList.add('hidden');
             perfilDiv.classList.remove('hidden');
 
-            // Calcular Dimensiones Clínicas
+            // Calcular Dimensiones
             const dimA = r(2)+r(5)+r(10)+r(15)+r(20)+r(25)+r(29)+r(34)+r(39)+r(44);
             const dimB = r(1)+r(7)+r(11)+r(16)+r(21)+r(26)+r(31)+r(35)+r(40)+r(45);
             const dimC = r(4)+r(8)+r(13)+r(17)+r(22)+r(27)+r(32)+r(37)+r(41)+r(46);
             
-            // Dimensión D (Invertida: 3->0, 2->1, 1->2, 0->3)
             const invert = (val) => Math.abs(val - 3);
             const dimD = invert(r(3))+invert(r(9))+invert(r(14))+invert(r(19))+invert(r(23))+invert(r(28))+invert(r(33))+invert(r(38))+invert(r(43))+invert(r(47));
 
@@ -220,25 +242,37 @@
             document.getElementById('score-d').innerText = dimD;
             document.getElementById('score-total').innerText = total;
 
-            // Lógica ajustada por el menú desplegable
+            // Lógica de rangos ajustada por edad numérica exacta
             let diagnostico = "";
-
-            if (rangoEdad === "joven") { // 16 a 22
-                if(total <= 45) diagnostico = "Rango Normativo (Esperable para la etapa de desarrollo).";
-                else if(total <= 85) diagnostico = "Colapso Moderado (Fluctuación reactiva al estrés social).";
-                else diagnostico = "Colapso Severo (Mente emocional dominante, requiere contención).";
-            } else if (rangoEdad === "adulto") { // 23 a 59
-                if(total <= 35) diagnostico = "Rango Normativo (Capacidad reflexiva madura y estable).";
-                else if(total <= 75) diagnostico = "Colapso Moderado (Apagones reflexivos por estrés agudo).";
-                else diagnostico = "Colapso Severo (Regresión cognitiva, bloqueo reflexivo grave).";
-            } else if (rangoEdad === "mayor") { // 60+
-                if(total <= 40) diagnostico = "Rango Normativo (Considerando pragmatismo propio de la etapa).";
-                else if(total <= 80) diagnostico = "Colapso Moderado (Rigidez inusual frente a conflictos recientes).";
-                else diagnostico = "Colapso Severo (Revisar posible etiología orgánica o estrés agudo crítico).";
+            if (edadNum >= 16 && edadNum <= 22) {
+                if(total <= 45) diagnostico = "Rango Normativo"; else if(total <= 85) diagnostico = "Colapso Moderado"; else diagnostico = "Colapso Severo";
+            } else if (edadNum >= 23 && edadNum <= 59) {
+                if(total <= 35) diagnostico = "Rango Normativo"; else if(total <= 75) diagnostico = "Colapso Moderado"; else diagnostico = "Colapso Severo";
+            } else { // 60+
+                if(total <= 40) diagnostico = "Rango Normativo"; else if(total <= 80) diagnostico = "Colapso Moderado"; else diagnostico = "Colapso Severo";
             }
 
             document.getElementById('rango-texto').innerText = diagnostico;
+
+            // Recopilar respuestas del 1 al 48 para el reporte
+            let listaRespuestas = "";
+            for(let i = 1; i <= 48; i++) {
+                listaRespuestas += `${i}:[${r(i)}] `;
+                if(i % 12 === 0) listaRespuestas += "\n"; // Salto de línea cada 12 respuestas para que se vea ordenado
+            }
+
+            // Construir el mensaje estructurado de WhatsApp
+            mensajeWhatsApp = `Hola, soy ${nombre}.\nAcabo de completar mi inventario IFFR-48.\n\n*DATOS DEMOGRÁFICOS:*\nSexo: ${sexo}\nEdad: ${edadNum} años\nEducación: ${educacion}\n\n*RESULTADOS:*\nÍndice Total (ITFR): *${total} puntos*\nEstado: *${diagnostico}*\n\n*PERFIL DIMENSIONAL:*\nA. Hipermentalización: ${dimA}/30\nB. Equivalencia Psíquica: ${dimB}/30\nC. Pensamiento Teleológico: ${dimC}/30\nD. Falla en Resiliencia: ${dimD}/30\n\n*DESGLOSE DE RESPUESTAS (1-48):*\n${listaRespuestas}\nPrueba Válida: Sí.`;
+
             resDiv.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Evento para el botón de WhatsApp
+        document.getElementById('btn-whatsapp').addEventListener('click', function() {
+            if(mensajeWhatsApp !== "") {
+                const url = `https://wa.me/${numeroPsicologo}?text=${encodeURIComponent(mensajeWhatsApp)}`;
+                window.open(url, '_blank');
+            }
         });
     </script>
 </body>
